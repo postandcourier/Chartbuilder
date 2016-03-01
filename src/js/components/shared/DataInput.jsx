@@ -6,14 +6,12 @@ var update = require("react-addons-update");
 var ChartViewActions = require("../../actions/ChartViewActions");
 var ChartServerActions = require("../../actions/ChartServerActions");
 
-var errorNames = require("../../util/error-names");
 var validateChartModel = require("../../util/validate-chart-model");
 
 var chartbuilderUI = require("chartbuilder-ui");
 var TextArea = chartbuilderUI.TextArea;
-var Alert = chartbuilderUI.Alert;
+
 var DataSeriesTypeSettings = require("../shared/DataSeriesTypeSettings.jsx");
-var ErrorMessage = require("../shared/ErrorMessage.jsx");
 
 /**
  * ### Text area component and error messaging for data input
@@ -23,7 +21,6 @@ var ErrorMessage = require("../shared/ErrorMessage.jsx");
 var DataInput = React.createClass({
 
 	propTypes: {
-		errors: PropTypes.array.isRequired,
 		chartProps: PropTypes.shape({
 			chartSettings: PropTypes.array,
 			data: PropTypes.array,
@@ -35,8 +32,6 @@ var DataInput = React.createClass({
 
 	getInitialState: function() {
 		return {
-			alertType: "default",
-			alertText: "Waiting for data...",
 			boldText: "",
 			dropping: false
 		};
@@ -100,34 +95,8 @@ var DataInput = React.createClass({
 		);
 	},
 
-	_renderErrors: function() {
-
-		if (this.props.errors.length === 0) {
-			return null;
-		} else {
-
-			var errors = this.props.errors.map(function(error, i) {
-				return (
-					<ErrorMessage
-						key={i}
-						type={error.type}
-						text={error.text}
-					/>
-				);
-			});
-
-			return (
-				<div className="error-display">
-					{errors}
-				</div>
-			);
-		}
-	},
-
 	// Render the data input text area and indicator
 	_renderDataInput: function() {
-
-		var errors = this._renderErrors();
 
 		return (
 			<div className={this.props.className}
@@ -140,7 +109,6 @@ var DataInput = React.createClass({
 					className="data-input"
 					defaultValue={this.props.chartProps.input.raw}
 				/>
-				{errors}
 				<DataSeriesTypeSettings
 					onUpdate={this._handleReparseUpdate.bind(null, "type")}
 					chartProps={this.props.chartProps}

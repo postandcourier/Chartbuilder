@@ -23,9 +23,9 @@ var Canvas = require("./Canvas.jsx");
 var ChartExport = require("./ChartExport.jsx");
 var ChartMetadata = require("./ChartMetadata.jsx");
 var ChartTypeSelector = require("./ChartTypeSelector.jsx");
-var ErrorDisplay = require("./ErrorDisplay.jsx");
 var RendererWrapper = require("./RendererWrapper.jsx");
 var LocalStorageTimer = require("./LocalStorageTimer.jsx");
+var AlertGroup = require("chartbuilder-ui").AlertGroup;
 
 var svgWrapperClassName = {
 	desktop: "renderer-svg-desktop",
@@ -198,9 +198,8 @@ var Chartbuilder = React.createClass({
 						additionalComponents={this.props.additionalComponents.metadata}
 					/>
 					{mobileOverrides}
-					<ErrorDisplay
-						stepNumber={String(editorSteps + 3)}
-						messages={this.state.errors.messages}
+					<AlertGroup
+						alerts={this.state.errors.messages}
 					/>
 					<ChartExport
 						data={this.state.chartProps.data}

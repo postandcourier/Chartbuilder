@@ -24,6 +24,7 @@ var XY_yScaleSettings = require("../shared/XY_yScaleSettings.jsx");
 
 /* Chartbuilder UI components */
 var chartbuilderUI = require("chartbuilder-ui");
+var AlertGroup = chartbuilderUI.AlertGroup;
 var Button = chartbuilderUI.Button;
 var ButtonGroup = chartbuilderUI.ButtonGroup;
 var ColorPicker = chartbuilderUI.ColorPicker;
@@ -76,6 +77,19 @@ var XYEditor = React.createClass({
 		};
 	},
 
+	_renderErrors: function(errors) {
+
+		if (errors.length === 0) {
+			return null;
+		} else {
+			console.log(errors)
+			return (
+				<AlertGroup alerts={errors} />
+			);
+		}
+
+	},
+
 	render: function() {
 		var chartProps = this.props.chartProps;
 		var scaleSettings = [];
@@ -101,19 +115,18 @@ var XYEditor = React.createClass({
 			);
 		}, this));
 
-		var inputErrors = this.props.errors.messages.filter(function(e) {
+		var inputErrors = this._renderErrors(this.props.errors.messages.filter(function(e) {
 			return e.location === "input";
-		});
+		}));
 
-		var axisErrors = this.props.errors.messages.filter(function(e) {
+		var axisErrors = this._renderErrors(this.props.errors.messages.filter(function(e) {
 			return e.location === "axis";
-		});
+		}));
 
 		/* Y scale settings */
 		scaleSettings.push(
 			<XY_yScaleSettings
 				scale={chartProps.scale}
-				errors={axisErrors}
 				className="scale-options"
 				onUpdate={this._handlePropAndReparse.bind(null, "scale")}
 				onReset={this._handlePropAndReparse.bind(null, "scale")}
@@ -175,6 +188,7 @@ var XYEditor = React.createClass({
 						chartProps={chartProps}
 						className="data-input"
 					/>
+					{inputErrors}
 				</div>
 				<div className="editor-options">
 					<h2>
@@ -190,6 +204,7 @@ var XYEditor = React.createClass({
 				<div className="editor-options">
 					{scaleSettings}
 				</div>
+				{axisErrors}
 			</div>
 		);
 	}

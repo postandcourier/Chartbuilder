@@ -26,6 +26,7 @@ var Button = chartbuilderUI.Button;
 var ButtonGroup = chartbuilderUI.ButtonGroup;
 var ColorPicker = chartbuilderUI.ColorPicker;
 var TextInput = chartbuilderUI.TextInput;
+
 var help = require("../../util/helper.js");
 
 var ChartEditorMixin = require("../mixins/ChartEditorMixin.js");
@@ -67,6 +68,18 @@ var ChartGridEditor = React.createClass({
 		};
 	},
 
+	_renderErrors: function(errors) {
+
+		if (errors.length === 0) {
+			return null;
+		} else {
+			return (
+				<AlertGroup alerts={errors} />
+			);
+		}
+
+	},
+
 	render: function() {
 		var chartProps = this.props.chartProps;
 		var chartSettings;
@@ -87,13 +100,13 @@ var ChartGridEditor = React.createClass({
 			);
 		}, this));
 
-		var inputErrors = this.props.errors.messages.filter(function(e) {
+		var inputErrors = this._renderErrors(this.props.errors.messages.filter(function(e) {
 			return e.location === "input";
-		});
+		}));
 
-		var axisErrors = this.props.errors.messages.filter(function(e) {
+		var axisErrors = this._renderErrors(props.errors.messages.filter(function(e) {
 			return e.location === "axis";
-		});
+		}));
 
 		/*
 		 * Settings to control the numerical scale. It will be different for bar
@@ -136,7 +149,7 @@ var ChartGridEditor = React.createClass({
 					stepNumber="5"
 					onUpdate={this._handlePropUpdate.bind(null, "scale")}
 				/>
-			)
+			);
 		} else if (chartProps.scale.isNumeric) {
 			scaleSettings.push(
 				<NumericScaleSettings
@@ -149,7 +162,7 @@ var ChartGridEditor = React.createClass({
 					name="Bottom"
 					stepNumber="5"
 				/>
-			)
+			);
 		}
 
 		return (
@@ -160,10 +173,10 @@ var ChartGridEditor = React.createClass({
 						<span>Input your data</span>
 					</h2>
 					<DataInput
-						errors={inputErrors}
 						chartProps={chartProps}
 						className="data-input"
 					/>
+					{inputErrors}
 				</div>
 				<div className="editor-options">
 					<h2>
@@ -187,6 +200,7 @@ var ChartGridEditor = React.createClass({
 				<div className="editor-options">
 					{scaleSettings}
 				</div>
+				{axisErrors}
 			</div>
 		);
 	}

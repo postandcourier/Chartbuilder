@@ -41,7 +41,7 @@ function validateDataInput(chartProps) {
 	}
 
 	// Whether a column has a different number of values
-	var unevenSeries = dataPointTest(
+	var unevenSeries = filteredDataPointTest(
 			series,
 			function(val) { return val.value !== null ? (val.value === undefined || val.value.length === 0) : false;},
 			function(empty,vals) { return empty.length !== vals[0].length;}
@@ -52,12 +52,11 @@ function validateDataInput(chartProps) {
 	}
 
 	// Whether a column has something that is NaN but is not nothing (blank) or `null`
-	var nanSeries = dataPointTest(
+	var nanSeries = someDataPointTest(
 			series,
 			function(val) {
 				return (isNaN(val.value) && val.value !== undefined && val.value !== "");
-			},
-			function(nan, vals) { return nan.length > 0;}
+			}
 		);
 
 	if (nanSeries) {
@@ -72,10 +71,9 @@ function validateDataInput(chartProps) {
 
 	//Whether an entry column that is supposed to be a Number is not in fact a number
 	if(isNumeric || chartProps.input.type == "numeric") {
-		var badNumSeries = dataPointTest(
+		var badNumSeries = someDataPointTest(
 				series,
-				function(val) { return isNaN(val.entry); },
-				function(bn,vals) { return bn.length > 0;}
+				function(val) { return isNaN(val.entry); }
 			);
 
 		if (badNumSeries) {
@@ -85,10 +83,9 @@ function validateDataInput(chartProps) {
 
 	// Whether an entry column that is supposed to be a date is not in fact a date
 	if(hasDate || chartProps.input.type == "date") {
-		var badDateSeries = dataPointTest(
+		var badDateSeries = someDataPointTest(
 				series,
-				function(val) { return !val.entry.getTime || isNaN(val.entry.getTime()); },
-				function(bd,vals) { return bd.length > 0;}
+				function(val) { return !val.entry.getTime || isNaN(val.entry.getTime()); }
 			);
 
 		if (badDateSeries) {
@@ -97,10 +94,9 @@ function validateDataInput(chartProps) {
 	}
 
 	// Whether a column has NaN
-	var largeNumbers = dataPointTest(
+	var largeNumbers = someDataPointTest(
 			series,
-			function(val) { return Math.floor(val.value).toString().length > 4; },
-			function(largeNums, vals) { return largeNums.length > 0;}
+			function(val) { return Math.floor(val.value).toString().length > 4; }
 		);
 
 	if (largeNumbers) {
@@ -126,14 +122,22 @@ function validateDataInput(chartProps) {
 
 }
 
-function dataPointTest(series, filterTest, someTest) {
-	// A function to systemitize looping through every datapoint
-	var vals = map(series, function(d,i) {
+// check whether all data points in all series match some conidition. returns
+// as soon as one failure found
+function someDataPointTest(series, someTest) {
+	return some(series, function(s) {
+		return some(s.values, someTest);
+	});
+}
+
+// Check if filtered array of data passes a some test
+function filteredDataPointTest(series, filterTest, someTest) {
+	var filteredVals = map(series, function(d,i) {
 		return filter(d.values, filterTest);
 	});
 
-	return some(vals, function(n) {
-		return someTest(n,vals);
+	return some(filteredVals, function(n) {
+		return someTest(n, filteredVals);
 	});
 }
 

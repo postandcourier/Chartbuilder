@@ -82,7 +82,6 @@ var XYEditor = React.createClass({
 		if (errors.length === 0) {
 			return null;
 		} else {
-			console.log(errors)
 			return (
 				<AlertGroup alerts={errors} />
 			);
